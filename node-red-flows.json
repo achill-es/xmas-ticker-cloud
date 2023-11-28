@@ -1,0 +1,291 @@
+[
+    {
+        "id": "7867ef33.92c52",
+        "type": "mqtt out",
+        "z": "2f9a97e9.759058",
+        "name": "window-text",
+        "topic": "MatrixDisplay2/text",
+        "qos": "1",
+        "retain": "true",
+        "broker": "a693d6bd.28df48",
+        "x": 770,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "5a1dd3d8.abd4fc",
+        "type": "function",
+        "z": "2f9a97e9.759058",
+        "name": "calc-countdown",
+        "func": "//  date and time of end of countdown:\n//  YYYY-MM-DD hh:mm\nconst deadline = '2023-12-06 05:00';\n\n//  calculate difference from now to deadline:\nvar delta = Date.parse(deadline) - msg.payload;\nvar days = Math.floor(delta/(1000*60*60*24)) + 1;\n\nif (days > 1)\n{\n    msg.payload = \"Noch \" + days + \" Tage bis Nikolausi... \";\n}\nelse if (days == 1)\n{\n    msg.payload = \"Lasst uns froh und munter sein!    \";\n}\nelse if (days === 0)\n{\n    msg.payload = \"Schon in den Stiefel geschaut?    \";\n}\nelse\n{\n    msg.payload = \"Jetzt geht's auf Weihnachten zu... \";\n}\n\nnode.send(msg);\n\n// end of js code",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 440,
+        "y": 80,
+        "wires": [
+            [
+                "7867ef33.92c52"
+            ],
+            [
+                "ecb80556.8fc258"
+            ]
+        ]
+    },
+    {
+        "id": "1d9bc880.a62fa8",
+        "type": "inject",
+        "z": "2f9a97e9.759058",
+        "name": "motd",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 05 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 230,
+        "y": 80,
+        "wires": [
+            [
+                "5a1dd3d8.abd4fc"
+            ]
+        ]
+    },
+    {
+        "id": "ecb80556.8fc258",
+        "type": "debug",
+        "z": "2f9a97e9.759058",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 630,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "49c1cd72.7b3014",
+        "type": "debug",
+        "z": "2f9a97e9.759058",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 490,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "f5f704a1.274548",
+        "type": "sunrise",
+        "z": "2f9a97e9.759058",
+        "name": "dayornight",
+        "lat": "48.100000",
+        "lon": "11.500000",
+        "start": "sunrise",
+        "end": "goldenHour",
+        "soff": 0,
+        "eoff": 0,
+        "x": 260,
+        "y": 280,
+        "wires": [
+            [
+                "49c1cd72.7b3014"
+            ],
+            [
+                "bde5ec03.e911f"
+            ]
+        ]
+    },
+    {
+        "id": "bde5ec03.e911f",
+        "type": "function",
+        "z": "2f9a97e9.759058",
+        "name": "calc-intensity",
+        "func": "if(msg.payload == 1)    // day\n{\n    msg.payload = 7;   // brightest intensity possible\n}\nelse //msg.payload==0 -> night\n{\n    msg.payload = 1;    // darkest intensity visible\n}\nnode.send(msg);",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 490,
+        "y": 320,
+        "wires": [
+            [
+                "b04c75f1.0d2668"
+            ],
+            [
+                "bc45b377.9014b"
+            ]
+        ]
+    },
+    {
+        "id": "b04c75f1.0d2668",
+        "type": "mqtt out",
+        "z": "2f9a97e9.759058",
+        "name": "window-brightness",
+        "topic": "MatrixDisplay2/intensity",
+        "qos": "0",
+        "retain": "true",
+        "broker": "a693d6bd.28df48",
+        "x": 770,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "ef0a11c5.58138",
+        "type": "inject",
+        "z": "2f9a97e9.759058",
+        "name": "scrollspeedmsec",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "MatrixDisplay2/scrollwait",
+        "payload": "28",
+        "payloadType": "num",
+        "x": 290,
+        "y": 420,
+        "wires": [
+            [
+                "eb77d568.77c5a8",
+                "20d9864a.27a83a"
+            ]
+        ]
+    },
+    {
+        "id": "eb77d568.77c5a8",
+        "type": "mqtt out",
+        "z": "2f9a97e9.759058",
+        "name": "window-speed",
+        "topic": "MatrixDisplay2/scrollwait",
+        "qos": "0",
+        "retain": "true",
+        "broker": "a693d6bd.28df48",
+        "x": 780,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "20d9864a.27a83a",
+        "type": "debug",
+        "z": "2f9a97e9.759058",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 550,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "bc45b377.9014b",
+        "type": "debug",
+        "z": "2f9a97e9.759058",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "2675ce5e.2c6c32",
+        "type": "inject",
+        "z": "2f9a97e9.759058",
+        "name": "set intensity",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "MatrixDisplay2/intensity",
+        "payload": "1",
+        "payloadType": "num",
+        "x": 550,
+        "y": 260,
+        "wires": [
+            [
+                "b04c75f1.0d2668"
+            ]
+        ]
+    },
+    {
+        "id": "a693d6bd.28df48",
+        "type": "mqtt-broker",
+        "name": "<your-username>",
+        "broker": "<your-broker>",
+        "port": "8883",
+        "tls": "7f901956.293968",
+        "clientid": "",
+        "usetls": true,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "7f901956.293968",
+        "type": "tls-config",
+        "name": "EQMX",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "broker.emqx.io-ca.crt",
+        "servername": "",
+        "verifyservercert": true
+    }
+]
